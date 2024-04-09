@@ -12,13 +12,20 @@ interface SignUpRequestBody {
   email : string; 
 }
 
+interface loginRequestBody {
+    username: string;
+    password: string;
+  }
+
 const userSchema = z.object({
     username: z.string(),
     password : z.string().min(8).max(16),
     email : z.string(),
-   
 });
-
+const loginSchema = z.object({
+    username: z.string(),
+    password : z.string().min(8).max(16),
+});
 
 
 export const signUp = async (req: Request<{}, {}, SignUpRequestBody>, res: Response) => {
@@ -72,3 +79,47 @@ export const signUp = async (req: Request<{}, {}, SignUpRequestBody>, res: Respo
     return res.status(500).json({ message: "Error creating user" });
   }
 };
+export const login = async (req: Request<{}, {}, loginRequestBody>, res: Response) => {
+    try {
+      const body : any   =  loginSchema.safeParse(req.body);
+      
+      const validationResult = loginSchema.safeParse(req.body);
+  
+      if (!validationResult.success) {
+          return res.status(400).json({ message: "Invalid request body", errors: validationResult.error });
+      }
+
+      const { username, password  } = validationResult.data;
+
+      if (!username || !password) {
+          return res.status(400).json({ message: "Please input username and password" });
+      }
+    // Check If User Exists In The Database
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+ 
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+       "1234!@#%<{*&)",
+      { expiresIn: "1h" }
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Login Successful", data: user, token });
+    
+     } catch (error:any) {
+      console.log(error.message);
+      return res.status(500).json({ message: "Error Logging in" });
+    }
+  };
+  

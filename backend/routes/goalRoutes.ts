@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
 import GoalModel from '../models/Goal';
 import * as z from "zod";
-const router = express.Router();
+
+const goalRouter = express.Router();
 
 const goalSchema = z.object({
     name: z.string(),
@@ -11,7 +12,7 @@ const goalSchema = z.object({
     endDate: z.date(),
 });
 
-router.post('/createGoal', async (req: Request, res: Response) => {
+goalRouter.post('/createGoal', async (req: Request, res: Response) => {
     const { name, target, currentValue, startDate, endDate } = req.body;
     try {
         const goal = new GoalModel({
@@ -23,16 +24,13 @@ router.post('/createGoal', async (req: Request, res: Response) => {
         });
 
         const savedGoal = await GoalModel.create(goal);
-
-
-
         res.json(savedGoal);
     } catch (error : any) {
         res.status(500).json({ message: error.message });
     }
 });
 
-router.get('/viewGoal/:id', async (req: Request, res: Response) => {
+goalRouter.get('/viewGoal/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -48,7 +46,7 @@ router.get('/viewGoal/:id', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/updateGoal/:id', async (req: Request, res: Response) => {
+goalRouter.put('/updateGoal/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, target, currentValue, startDate, endDate } = req.body;
 
@@ -71,7 +69,7 @@ router.put('/updateGoal/:id', async (req: Request, res: Response) => {
     }
 });
 
-router.delete('/deleteGoal/:id', async (req: Request, res: Response) => {
+goalRouter.delete('/deleteGoal/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -87,6 +85,4 @@ router.delete('/deleteGoal/:id', async (req: Request, res: Response) => {
     }
 });
 
-
-
-export default router;
+export default goalRouter;
