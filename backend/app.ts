@@ -10,6 +10,7 @@ const app = express();
 connectDB();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.json());
 
 // Use the routes
 app.use('/api', router);

@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
  
-interface GoalInterface extends Document {
+export interface IGoal  extends Document {
     name: string;
     target: number;
     currentValue: number;
@@ -16,6 +16,6 @@ const goalSchema: Schema = new Schema({
     endDate: { type: Date, required: true },
 });
 
-const GoalModel = mongoose.model<GoalInterface>('Goal', goalSchema);
+const GoalModel = mongoose.model<IGoal>('Goal', goalSchema);
 
 export default GoalModel;

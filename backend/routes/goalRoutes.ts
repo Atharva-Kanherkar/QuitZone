@@ -1,7 +1,15 @@
 import express, { Request, Response } from 'express';
 import GoalModel from '../models/Goal';
-
+import * as z from "zod";
 const router = express.Router();
+
+const goalSchema = z.object({
+    name: z.string(),
+    target: z.number(),
+    currentValue: z.number(),
+    startDate: z.date(),
+    endDate: z.date(),
+});
 
 router.post('/createGoal', async (req: Request, res: Response) => {
     const { name, target, currentValue, startDate, endDate } = req.body;
@@ -15,6 +23,8 @@ router.post('/createGoal', async (req: Request, res: Response) => {
         });
 
         const savedGoal = await GoalModel.create(goal);
+
+
 
         res.json(savedGoal);
     } catch (error : any) {
