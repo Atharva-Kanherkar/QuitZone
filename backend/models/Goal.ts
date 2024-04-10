@@ -3,29 +3,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 export enum GoalType{
     QuitSmoking = "Quit Smoking",
     QuitDrinking = "Quit Drinking",
-    QuitDrugs = "Quit Drugs",
-    WeightLoss = "Weight Loss",
-    WeightGain = "Weight Gain",
-    Exercise = "Exercise",
-    Running = "Running",
-    Walking = "Walking",
-    Cycling = "Cycling",
-    Swimming = "Swimming",
-    Yoga = "Yoga",
-    Meditation = "Meditation",
-    Reading = "Reading",
-    Writing = "Writing",
-    Learning = "Learning",
-    Saving = "Saving",
-    Investment = "Investment",
-    Charity = "Charity",
-    Social = "Social",
-    Family = "Family",
-    Friends = "Friends",
-    Relationship = "Relationship",
-    Marriage = "Marriage",
+    QuitDrugs = "Quit Drugs"
 }
 export interface IGoal  extends Document {
+    userId: Schema.Types.ObjectId;
     name: GoalType;
     target: number;
     currentValue: number;
@@ -34,6 +15,7 @@ export interface IGoal  extends Document {
 }
 
 const goalSchema: Schema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: 'User',   },
     name: { type:  String, required: true },
     target: { type: Number, required: true },
     currentValue: { type: Number, required: true },
@@ -41,6 +23,7 @@ const goalSchema: Schema = new Schema({
     endDate: { type: Date, required: true },
 });
 
+ 
 const GoalModel = mongoose.model<IGoal>('Goal', goalSchema);
 
 export default GoalModel;

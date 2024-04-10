@@ -1,8 +1,12 @@
 import express, { Request, Response } from 'express';
 import GoalModel from '../models/Goal';
 import * as z from "zod";
-
+import { ParamsDictionary } from 'express-serve-static-core';
 const goalRouter = express.Router();
+
+interface RequestWithUser extends Request<ParamsDictionary> {
+    userId: string;
+}
 
 const goalSchema = z.object({
     name: z.string(),
@@ -12,8 +16,11 @@ const goalSchema = z.object({
     endDate: z.date(),
 });
 
-goalRouter.post('/createGoal', async (req: Request, res: Response) => {
+goalRouter.post('/createGoal', async ( req , res ) => {
     const { name, target, currentValue, startDate, endDate } = req.body;
+
+    const userId = (req as RequestWithUser).userId;
+
     try {
         const goal = new GoalModel({
             name,
@@ -22,8 +29,10 @@ goalRouter.post('/createGoal', async (req: Request, res: Response) => {
             startDate,
             endDate
         });
+    
 
         const savedGoal = await GoalModel.create(goal);
+       
         res.json(savedGoal);
     } catch (error : any) {
         res.status(500).json({ message: error.message });
@@ -84,5 +93,19 @@ goalRouter.delete('/deleteGoal/:id', async (req: Request, res: Response) => {
         res.status(500).json({ message: error.message });
     }
 });
+goalRouter.get('/goals', async (req: Request, res: Response) => {
+    const { userId } = req.body;
 
+    try {
+        const goals = await GoalModel.find({ userId: userId });
+
+        if (!goals) {
+            return res.status(404).json({ message: 'Goals not found' });
+        }
+
+        res.json(goals);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+});
 export default goalRouter;

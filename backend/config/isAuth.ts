@@ -19,6 +19,7 @@ export const verifyToken = async (
         if (!decoded) {
             throw new Error();
         }
+        console.log(decoded);
         req.user = decoded;
         next();
     } catch (error) {
