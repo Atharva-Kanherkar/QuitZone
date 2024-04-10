@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import * as z from "zod";
 
-
+interface RequestWithUser extends Request {
+  userId: string;
+}
 
 interface SignUpRequestBody {
   username: string;
@@ -124,4 +126,16 @@ export const login = async (req: Request<{}, {}, loginRequestBody>, res: Respons
   };
 
   
-  
+export const profile = async (req: Request, res: Response) =>   {
+  const userId = (req as RequestWithUser).userId;
+
+  const userProfile = User.findById({userId});
+
+   if (userProfile) {
+      
+      res.status(200).json(userProfile);
+  } else {
+    
+      res.status(404).json({ message: 'User profile not found' });
+  }
+}
