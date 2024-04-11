@@ -8,8 +8,8 @@ export interface IPost extends Document {
     comments: Schema.Types.ObjectId[];
     likes: Schema.Types.ObjectId[];
     tags: string[];
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date; 
+    updatedAt: Date;  
 }
 
 const postSchema: Schema = new Schema({
