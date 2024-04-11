@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IGoal } from './Goal';
+import { IPost } from './Post';
  
 export interface IUser extends Document {
     username: string;
@@ -8,6 +9,7 @@ export interface IUser extends Document {
     password: string;
     createdAt: Date;
     updatedAt: Date;
+    posts : IPost[];
 }
 
 // Define the User schema
@@ -21,6 +23,10 @@ const UserSchema: Schema = new Schema({
             ref: 'Goal'
         }]
  ,
+    posts: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Post'
+        }],
     email: {
         type: String,
         unique: true
