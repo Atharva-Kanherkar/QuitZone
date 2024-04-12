@@ -2,30 +2,34 @@ import { Request, Response } from "express";
 import Post from "../models/Post";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
-interface RequestWithUser extends Request {
-    userId: string;
-  }
 
-export const createPost = async (req: Request, res: Response) => { 
-
-    const { title, content } = req.body as { title: string, content: string };
-    // const userId = (req as RequestWithUser).userId;
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
-    const decoded = jwt.verify(token, "1234!@#%<{*&)") as any;
-    const userId = decoded.userId;
-    try {
-        const currentUser = await User.findById((req as RequestWithUser).userId);
-        const post = await Post.create({ title, content,author: userId});
-        currentUser?.posts.push(post._id);
-        res.status(201).json(post);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
+  export const createPost = async (req: Request, res: Response) => {
+      const { title, content } = req.body as { title: string, content: string };
+      const token = req.headers.authorization?.split(" ")[1];
+      
+      if (!token) {
+          return res.status(401).json({ error: "Unauthorized" });
+      }
+  
+      try {
+          const decoded = jwt.verify(token, "1234!@#%<{*&)") as any;
+          const userId = decoded.userId;
+          
+          const currentUser = await User.findById(userId);
+          if (!currentUser) {
+              return res.status(404).json({ message: "User not found" });
+          }
+  
+          const post = await Post.create({ title, content, author: userId });
+          currentUser.posts.push(post._id);
+          await currentUser.save();
+  
+          res.status(201).json(post);
+      } catch (error: any) {
+          res.status(500).json({ message: error.message });
+      }
+  };
+  
 
 export const viewPost = async (req: Request, res: Response) => {
     const { id } = req.params;
