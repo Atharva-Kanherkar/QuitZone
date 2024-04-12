@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Post from "../models/Post";
 import User from "../models/User";
-
+import jwt from "jsonwebtoken";
 interface RequestWithUser extends Request {
     userId: string;
   }
@@ -9,8 +9,13 @@ interface RequestWithUser extends Request {
 export const createPost = async (req: Request, res: Response) => { 
 
     const { title, content } = req.body as { title: string, content: string };
-    const userId = (req as RequestWithUser).userId;
-  
+    // const userId = (req as RequestWithUser).userId;
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    const decoded = jwt.verify(token, "1234!@#%<{*&)") as any;
+    const userId = decoded.userId;
     try {
         const currentUser = await User.findById((req as RequestWithUser).userId);
         const post = await Post.create({ title, content,author: userId});
